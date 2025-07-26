@@ -133,7 +133,7 @@
             className="input-box"
             placeholder="Your Quote"
             value={quote}
-            onChange={(e) => setQuote(e.target)}
+            onChange={(e) => setQuote(e.target.value)}
           />
           <Button text="Submit Quote" onClick={handleSubmit} />
         </div>
