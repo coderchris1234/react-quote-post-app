@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>React Quote Submission App</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    header {
+      background: #1e1e2f;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+    }
+    nav a {
+      margin: 0 10px;
+      color: #fff;
+      text-decoration: none;
+    }
+    .button {
+      padding: 8px 12px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    .input-box {
+      margin: 10px 0;
+      display: block;
+      padding: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+    .post-card {
+      background: white;
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 6px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+    }
+    .initials {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #007bff;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- Load React and Babel -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- Your JSX/React code -->
+  <script type="text/babel">
+
+    // Reusable Button Component
+    function Button({ text, onClick, className }) {
+      return <button className={className || "button"} onClick={onClick}>{text}</button>;
+    }
+
+    // Header Component
+    function Header() {
+      return (
+        <header>
+          <h2>Eflex Code</h2>
+          <nav>
+            <a href="#">Home</a>
+            <a href="#">About</a>
+            <a href="#">Services</a>
+            <a href="#">Contact</a>
+          </nav>
+          <div style={{ marginTop: "10px" }}>
+            <Button text="Get Started" />
+            <Button text="Login" />
+          </div>
+        </header>
+      );
+    }
+
+    // User Input Component
+    function UserInput({ onSubmit }) {
+      const [name, setName] = React.useState('');
+      const [quote, setQuote] = React.useState('');
+
+      const handleSubmit = () => {
+        if (!name.trim() || !quote.trim()) {
+          alert("Please fill in both fields.");
+          return;
+        }
+
+        const initials = name.split(" ").map(n => n[0].toUpperCase()).join("");
+        const newPost = {
+          name,
+          quote,
+          initials,
+          date: new Date().toLocaleString()
+        };
+
+        onSubmit(newPost);
+        setName('');
+        setQuote('');
+      };
+
+      return (
+        <div style={{ marginTop: "20px" }}>
+          <input
+            className="input-box"
+            placeholder="Full Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <textarea
+            className="input-box"
+            placeholder="Your Quote"
+            value={quote}
+            onChange={(e) => setQuote(e.target.value)}
+          />
+          <Button text="Submit Quote" onClick={handleSubmit} />
+        </div>
+      );
+    }
+
+    // Post Card Component
+    function PostCard({ post }) {
+      return (
+        <div className="post-card">
+          <div className="post-header">
+            <div className="initials">{post.initials}</div>
+            <div>
+              <strong>{post.name}</strong>
+              <div style={{ fontSize: "0.8em", color: "#555" }}>{post.date}</div>
+            </div>
+          </div>
+          <p style={{ marginTop: "10px" }}>{post.quote}</p>
+        </div>
+      );
+    }
+
+    // Main App
+    function App() {
+      const [posts, setPosts] = React.useState(() => {
+        const saved = localStorage.getItem("posts");
+        return saved ? JSON.parse(saved) : [];
+      });
+
+      const addPost = (newPost) => {
+        const updated = [newPost, ...posts];
+        setPosts(updated);
+        localStorage.setItem("posts", JSON.stringify(updated));
+      };
+
+      return (
+        <div>
+          <Header />
+          <UserInput onSubmit={addPost} />
+          <h3 style={{ marginTop: "30px" }}>Quotes:</h3>
+          {posts.length === 0 ? (
+            <p>No quotes submitted yet.</p>
+          ) : (
+            posts.map((post, index) => <PostCard key={index} post={post} />)
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
